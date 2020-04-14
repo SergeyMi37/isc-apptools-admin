@@ -6,22 +6,7 @@
       <Version>1.0.5</Version>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
-      
       <Resource Name="apptools.PKG"/>
-     
-       <CSPApplication 
-        Url="/apptoolsrest"
-        Recurse="1"
-        SourcePath="/apptools"
-        DeployPath="{$cspdir}/apptoolsrest" 
-        MatchRoles=":{$dbrole}"
-        PasswordAuthEnabled="0"
-        UnauthenticatedEnabled="0"
-        DispatchClass="App.rest"
-        ServeFiles="1"
-        CookiePath="/apptoolsrest"
-        UseCookies="2"
-       />
     </Module>
     
   </Document>
