@@ -15,6 +15,7 @@ USER irisowner
 
 COPY  Installer.cls .
 COPY  src src
+COPY  csp csp
 COPY irissession.sh /
 SHELL ["/irissession.sh"]
 
@@ -23,6 +24,14 @@ RUN \
   set sc = ##class(App.Installer).setup() \
   zn "%SYS" \
   write "Create web application ..." \
+  set webName = "/apptools" \
+  set webProperties("NameSpace") = "IRISAPP" \
+  set webProperties("Enabled") = 1 \
+  set webProperties("AutheEnabled") = 32 \
+  set sc = ##class(Security.Applications).Create(webName, .webProperties) \
+  write sc \
+  write "Web application "_webName_" has been created!" \
+  write "Create web application ..." \
   set webName = "/apptoolsrest" \
   set webProperties("DispatchClass") = "App.rest" \
   set webProperties("NameSpace") = "IRISAPP" \
@@ -30,15 +39,7 @@ RUN \
   set webProperties("AutheEnabled") = 32 \
   set sc = ##class(Security.Applications).Create(webName, .webProperties) \
   write sc \
-  write "Web application "_webName_" has been created!" 
-  write "Create web application ..." \
-  set webName = "/apptools" \
-  set webProperties("NameSpace") = "IRISAPP" \
-  set webProperties("Enabled") = 1 \
-  set webProperties("AutheEnabled") = 32 \
-  set sc = ##class(Security.Applications).Create(webName, .webProperties) \
-  write sc \
-  write "Web application "_webName_" has been created!" 
+  write "Web application "_webName_" has been created!" \
   zn "IRISAPP" \
   zpm "install webterminal"
 # bringing the standard shell back
