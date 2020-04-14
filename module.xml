@@ -1,31 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-  <Document name="contest-rest-template.ZPM">
+  <Document name="isc-apptools.ZPM">
     <Module>
-      <Name>contest-rest-template</Name>
-      <Version>1.0.2</Version>
+      <Name>isc-apptools</Name>
+      <Version>1.0.5</Version>
       <Packaging>module</Packaging>
-      <Dependencies>
-        <ModuleReference>
-          <Name>swagger-ui</Name>
-          <Version>*</Version>
-        </ModuleReference>
-      </Dependencies>
       <SourcesRoot>src</SourcesRoot>
       
-      <Resource Name="Sample.PKG"/>
+      <Resource Name="apptools.PKG"/>
      
        <CSPApplication 
-        Url="/crud"
+        Url="/apptoolsrest"
         Recurse="1"
-        SourcePath="/web"
-        DeployPath="{$cspdir}/crud" 
+        SourcePath="/apptools"
+        DeployPath="{$cspdir}/apptoolsrest" 
         MatchRoles=":{$dbrole}"
         PasswordAuthEnabled="0"
         UnauthenticatedEnabled="0"
-        DispatchClass="Sample.PersonREST"
+        DispatchClass="App.rest"
         ServeFiles="1"
-        CookiePath="/crud"
+        CookiePath="/apptoolsrest"
         UseCookies="2"
        />
     </Module>
