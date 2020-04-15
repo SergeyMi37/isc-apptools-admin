@@ -6,30 +6,29 @@
       <Version>1.0.5</Version>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
-      <Resource Name="App.PKG"/>
-	</Module>
-	  <CSPApplication 
-        Url="/apptools"
-        Recurse="1"
-        SourcePath="/csp/"
-        DeployPath="{$cspdir}/apptools" 
-        MatchRoles=":{$dbrole}"
-        PasswordAuthEnabled="0"
-        UnauthenticatedEnabled="0"
-        ServeFiles="1"
-        CookiePath="/apptools"
-        UseCookies="2"
-       />
-      <CSPApplication 
-        Url="/apptoolsrest"
-        Recurse="1"
-        MatchRoles=":{$dbrole}"
-        PasswordAuthEnabled="0"
-        UnauthenticatedEnabled="0"
-        DispatchClass="App.rest"
-        ServeFiles="1"
-        CookiePath="/apptools"
-        UseCookies="2"
-       />
+        <Resource Name="App.PKG"/>
+        
+        <CSPApplication 
+            SourcePath="/web"
+            DeployPath="${cspdir}/apptools"
+            Url="/apptools" 
+            CookiePath="/apptools/"
+            PasswordAuthEnabled="1"
+            AuthenticationMethods="32" 
+            MatchRoles=":%DB_${Namespace}"
+            Recurse="1"/>
+        
+        <CSPApplication
+            Url="/apptoolsrest"
+            CookiePath="/apptools/"
+            SourcePath="/web"
+            DeployPath="${cspdir}/apptools"
+            ServeFiles="1"
+            PasswordAuthEnabled="1"
+            AuthenticationMethods="32" 
+            MatchRoles=":%DB_${Namespace}"
+            DispatchClass="App.rest"/>
+            
+    </Module>
   </Document>
 </Export>
