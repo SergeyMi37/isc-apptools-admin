@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Export generator="Cache" version="25">
-  <Document name="isc-apptools.ZPM">
+  <Document name="isc-apptools-admin.ZPM">
     <Module>
-      <Name>isc-apptools</Name>
-      <Version>1.0.5</Version>
+      <Name>isc-apptools-admin</Name>
+      <Version>1.0.6</Version>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
         <Resource Name="App.PKG"/>

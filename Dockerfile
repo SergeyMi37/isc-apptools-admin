@@ -15,7 +15,7 @@ USER irisowner
 
 COPY  Installer.cls .
 COPY  src src
-COPY  csp csp
+COPY  web web
 COPY irissession.sh /
 SHELL ["/irissession.sh"]
 
