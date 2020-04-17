@@ -37,26 +37,44 @@ Open IRIS terminal:
 
 ```
 $ docker-compose exec iris iris session iris
-USER>zn "IRISAPP"
-```
 
-Let's create the apptools, apptoolsresr applications and write the mapping of package App in %All
-```
-IRISAPP>do ##class(App.Installer).CreateProjection()
+## Panel for admins & developers
 
-Installing AppTools application to IRISAPP
-Creating WEB application "/apptools"...
-WEB application "/apptools" is created.
-Creating WEB application "/apptoolsrest"...
-WEB application "/apptoolsrest" is created.
-%All namespace is created.
-Mapping AppTools package into all namespaces: %All
-AppTools package successfully mapped into all namespaces.
+ Load http://your-host:your-port/apptools/App.LogInfo.cls
+ - view the list of globals by mask with count blocks occupied by them.
+ - viewing global and direct and reverse with a possible filter by links and node data. Edit global nodes. Export a selection of nodes and global data to an XLS file and send the archive to an email.
+ - execution of queries and SQL statements with the ability to connect via JDBC / ODBC. Export the results to an XLS file and send the archive to an email.
+ - code execution by XECUTE command in the interface panel.
+ - saving commands and queries in the program history with the ability to run them again.
+ - there is a module for implementing the LockedDown mode - ##class(App.security).LockDown(...)
+ - multilanguage interface supported (install the global from C:\path\cache-iris-apptools-master\src\glb\appcachemsg.xml).
 
-http://055b0cf6722d:52773/apptools/App.LogInfo.cls
-http://055b0cf6722d:52773/apptools/App.TabsPanelUikitPermissMatrx.cls?autoload=Matrix
+## Charts admins
 
-```
+ Load http://your-host:your-port/apptools/App.Chart.cls?panel=class(App.ChartPanel).ChartAlert
+  - output of the DBMS events using the iris.log protocol (cconsole.log)
+
+ Load http://your-host:your-port/apptools/App.Chart.cls?panel=class(App.ChartPanel).ChartAlert
+  - output of the growth dynamics of DBMS database files using the iris.log protocol (cconsole.log)
+
+## Class explorer
+ Load http://your-host:your-port/apptools/App.FormExp.cls?panel=AccordionExp
+  - Navigation by namespaces, class, and class instance. Create, edit, and delete class instances in the on-screen form interface.
+
+##  Matrix permissions
+ Load http://your-host:your-port/apptools/apptools/App.TabsPanelUikitPermissMatrx.cls?autoload=Matrix
+  - Group assignment of roles to users by selecting them by filter in the screen panel
+
+## Templates & Samples  
+ Load http://your-host:your-port/apptools/App.TabsPanelSample.cls   
+ - jQuery-Ui.js based application template.
+  
+ Load http://your-host:your-port/apptools/App.TabsPanelUikit.cls
+ - UiKit.js based application template
+   
+ Load http://your-host:your-port/apptools/App.TabsPanelUikitAdmin.cls
+  - UiKit.js based application template for admin panels
+   
 
 ## Save queries to the global for future use in front-end applications
 ```
