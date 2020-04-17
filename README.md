@@ -37,6 +37,7 @@ Open IRIS terminal:
 
 ```
 $ docker-compose exec iris iris session iris
+```
 
 ## Panel for admins & developers
 
