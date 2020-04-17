@@ -1,6 +1,7 @@
 ![](https://github.com/SergeyMi37/isc-apptools-admin/blob/master/doc/favicon.ico)
 ## isc-apptools-admin
-[![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/isc-apptools)
+[![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/isc-apptools-admin-1)
+
 Application tools for technical support and DBMS administrator. View arrays, execute queries, including JDBC/ODBC, sending results to email as XLS files. A few simple graphs on the protocols of the system.
 
 ## Installation with ZPM
