@@ -302,7 +302,7 @@ ClassMethod UnMap(fromNS As %String) As %Status
 
 ClassMethod Ver() As %Status
 {
-	q "1.0.1"
+	q "1.0.5"
 }
 
 }

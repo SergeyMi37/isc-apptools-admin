@@ -3,7 +3,7 @@ Include App.LogMacro
 /// Export different types of modules in different subfolders in UDL (plain) format
 /// test.dfi -> /dfi/test.dfi
 /// testpkg.test.cls -> /cls/testpkg/test.cls
-/// Fork from Evgeny Shvarov 
+/// Fork from https://github.com/intersystems-ru/cache-udl
 Class App.code [ Abstract ]
 {
 
@@ -36,7 +36,7 @@ ClassMethod exp(dir = "", mask = "", ignoremask = "", csppapp = "")
 }
 
 /// import
-/// d ##class(App.code).imp("d:\dev\ToolBox-4-Iris-master\arsblue\") 
+/// d ##class(App.code).imp("/backup/iris/distr/apptools-all/src/xml/")
 ClassMethod imp(dir = "", mask = "")
 {
  d ..workdir(dir)

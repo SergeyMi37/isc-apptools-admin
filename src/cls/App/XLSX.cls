@@ -5,35 +5,44 @@ Class App.XLSX
 {
 
 /// Report generation in a given directory upon request with a given field format
-/// set sc = ##class(App.XLSX).Report2xlsx("/backup/temp/","select top 10 id,ClassName  FROM App.Log order by id desc","AppLogReport",",N")
+/// set sc = ##class(App.XLSX).Report2xlsx("/backup/temp/reports","select top 10 id,ClassName  FROM App.Log order by id desc","AppLogReport",",N")
 ClassMethod Report2xlsx(directory As %String, sql = "", filename = "", format = "", args...) As %Status
 {
 	q:sql="" $$$OK
-	set directory = ##class(%File).NormalizeDirectory(directory)
-	#dim sc As %Status = $$$OK
+	try {
+		set directory = ##class(%File).NormalizeDirectory(directory)
+		#dim sc As %Status = $$$OK
 
-	if ('##class(%File).DirectoryExists(directory)) {
-		do ##class(%File).CreateDirectoryChain(directory)
-	}
-	if ##class(%Dictionary.CompiledClass).%ExistsId("isc.SetEnv") {
-		set env = "EXCELMEMSIZE"
-		set sc = ##class(isc.SetEnv).Setup()
-		quit:$$$ISERR(sc) sc
-		set sc = ##class(isc.SetEnv).SetEnvVar(env, "4096m")
-		quit:$$$ISERR(sc) sc
-		set val = $system.Util.GetEnviron(env)
-	}
-	
-	i filename="" s filename=query_"-"_$system.Util.CreateGUID()
-	set file = filename_".xlsx"
-	set $$$AppL("MSW",$username_" Generated in")=directory_file
-	w !,"Generated in "_directory_file
-	set sc = ..generateFileFromSQL(directory_file, sql,format,args...)
-	if $$$ISERR(sc) w !,$System.Status.GetErrorText(sc) quit sc
-	set $$$AppL("MSW",$username_" Compliet in")=directory_file
-	w !,"Compliet "_directory_file
-	;set ..reportStream.Filename = directory _ file 
-	;set sc = ..%Save()
+		if ('##class(%File).DirectoryExists(directory)) {
+			do ##class(%File).CreateDirectoryChain(directory)
+		}
+		if ##class(%Dictionary.CompiledClass).%ExistsId("isc.SetEnv") {
+			set env = "EXCELMEMSIZE"
+			set sc = ##class(isc.SetEnv).Setup()
+			quit:$$$ISERR(sc) 
+			set sc = ##class(isc.SetEnv).SetEnvVar(env, "6048m")
+			quit:$$$ISERR(sc) 
+			set val = $system.Util.GetEnviron(env)
+		}
+		
+		i filename="" s filename=query_"-"_$system.Util.CreateGUID()
+		set file = filename_".xlsx"
+		set $$$AppL("MSW",$username_" Generated step 1")=directory_file
+		w !,"Generated in "_directory_file
+		set sc = ..generateFileFromSQL(directory_file, sql,format,args...)
+		if $$$ISERR(sc) w !,$System.Status.GetErrorText(sc) quit 
+		set $$$AppL("MSW",$username_" Compliet step 2")=directory_file
+		w !,"Compliet "_directory_file
+		;set ..reportStream.Filename = directory _ file 
+		;set sc = ..%Save()
+	} Catch ex {
+	   Set sc = $g(%objlasterror, $$$OK)
+	   Set sc = $$$ADDSC(sc, ex.AsStatus())
+	   set $$$AppL("MSW",$username_" Error")=$lb(ex.Name,ex.Code,ex.Location)
+	   w "Error type   "_ex.Name,!
+	   w "Error code   "_ex.Code,!
+	   w "Error location "_ex.Location,!
+ }
 	quit sc
 }
 
@@ -77,7 +86,7 @@ ClassMethod generateXMLFromSQL(xmlfile As %String, sql As %String, format = "", 
 	for i=1:1:columnCount {
 		#dim column As %SQL.StatementColumn
 		set column = metadata.columns.GetAt(i)
-		
+		;!!!
 		set class(i) = "<item excelName="""_ column.colName _ """"
 		if $p(format,",",i)'="" {
 			s type=$e($zconvert($p(format,",",i),"L"),1)
