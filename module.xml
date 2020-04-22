@@ -7,6 +7,7 @@
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
         <Resource Name="App.PKG"/>
+		<Resource Name="appcachemsg.GBL"/>
         
         <CSPApplication 
             SourcePath="/web"
