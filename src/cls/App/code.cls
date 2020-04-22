@@ -8,6 +8,7 @@ Class App.code [ Abstract ]
 {
 
 /// d ##class(App.code).e("/backup/iris/distr/apptools")
+/// d ##class(App.code).exp(/backup/iris/distr/apptools-lockdown/","App.Security")
 /// d $SYSTEM.OBJ.CompilePackage("App","cukd")
 /// do $system.OBJ.Load("d:\dev\apptools\src\glb\appcachemsg.xml","ck")
 /// do $system.OBJ.Load("/backup/source/apptools/src/glb/appcachemsg.xml","ck") ; loading translate

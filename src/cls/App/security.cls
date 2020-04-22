@@ -4,184 +4,6 @@ Include App.LogMacro
 Class App.security [ Abstract, DependsOn = App.msg ]
 {
 
-/// Increase system security to LockDown
-/// The method disables services and applications as in LockDown. Deletes the namespaces "DOCBOOK", "ENSDEMO", "SAMPLES"
-/// The method enables auditing and configures registration of all events in the portal, except for switching the log
-/// and modification of system properties
-/// For all predefined users, change the password and change the properties as in LockDown
-/// 	newPassword - new single password instead of %SYS. For LockDown security level, it has an 8.32ANP pattern
-/// 	sBindings = 1 Service %Service_bindings enable
-/// 	sCachedirect = 1 Service %Service_cachedirect enable
-/// 	InactiveLimit=90  
-/// 	DemoDelete=0 Demoens,Samples namespaces are being deleted 
-/// 	AuditOn=1 
-/// 	sECP = 1 Service %Service_ecp enable
-/// 	sBindingsIP - list of ip addresses with a semicolon for which to allow CacheStudio connection.
-/// 
-/// For ECP configurations, you need to add the addresses of all servers and clients to allow connection on %Net.RemoteConnection to remove "abandoned" tasks
-/// 	sCachedirectIP - list of ip addresses with a semicolon for which to allow legacy applications connection.
-/// 	sECPIP - list of ip addresses with a semicolon for which to allow connection to the ECP server.
-/// 	AuthLDAP = 1 In addition to the password, also enable LDAP authentication
-/// 	Application example:
-/// 	d ##class(App.security).LockDown("NewPassword123",.msg,1,1,0,0,0,0,"127.0.0.1","127.0.0.1")
-/// 	d ##class(App.security).LockDown("NewPassword123",.msg,1,1,0,0,1,0,"127.0.0.1","127.0.0.1",,1)
-ClassMethod LockDown(newPassword = "", Warn, sBindings = "", sCachedirect = "", InactiveLimit = 90, DemoDelete = 0, AuditOn = 1, sECP = "", sBindingsIP = "", sCachedirectIP = "", sECPIP = "", AuthLDAP = 0) As %Status
-{
-	new $namespace
-	set $namespace="%SYS"
-	write !,"Applications and services will be authenticated by "_$s('AuthLDAP:"password",1:"password and LDAP")
-	set AutheEnabled=$s(AuthLDAP:2080,1:32)
-	if DemoDelete,$zv["IRIS" set DemoDelete=0	
-	zn "%sys"
-	if newPassword'="" {
-		if newPassword'?8.32ANP s text="Password does not match the pattern 8.32ANP" write !,text QUIT $$$ERROR(text)
-		write !,"Password is reset to predefined users"
-		set tSC=##class(App.security).ChangePassword(newPassword, ##class(App.security).GetPreparedUsers())
-		if '$$$ISOK(tSC) QUIT $$$ERROR(tSC)
-	}
-	write !,"Modification of service properties:"
-	set result=##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
-	set tSC=result.Prepare("select NameLowerCase,ClientSystems FROM Security.Services")
-	set:tSC tSC=result.Execute()
-	if '$$$ISOK(tSC) {
-		set text="Service configuration error :"_$SYSTEM.Status.GetErrorText(tSC) write !,text
-		QUIT $$$ERROR(text)
-	}
-	else {
-		while result.Next() {
-			set name=result.Data("NameLowerCase")
-			#;skipping network services
-			continue:(name="%service_mirror")||(name="%service_shadow")||(name="%service_datacheck")
-			kill prop
-			set prop("Enabled")=0
-			if name="%service_csp"||(name="%service_console")||(name="%service_login") {
-				set prop("Enabled")=1 ; turn on
-				if name'="%service_csp" s prop("AutheEnabled")=AutheEnabled
-				else  s prop("AutheEnabled")=96
-			}
-			if $G(sBindings),name="%service_bindings" {
-				set prop("Enabled")=1
-				set prop("AutheEnabled")=AutheEnabled
-				set Warn($i(Warn))="If the current system does not intend to develop or edit the source code in CacheStudio, then it is better to turn off the service "_name
-				set prop("ClientSystems")=sBindingsIP
-			}
-			if $G(sCachedirect),name="%service_cachedirect" {
-				set prop("Enabled")=1 ; turn on
-				set prop("AutheEnabled")=96
-				set Warn($i(Warn))="If the current system does not intend to legacy utility, then it is better to turn off the service "_name
-				set prop("ClientSystems")=sCachedirectIP
-			}
-			if $G(sECP),name="%service_ecp" {
-				set prop("Enabled")=1
-				set Warn($i(Warn))="If the ECP configuration is not enabled on the current system, it is better to turn off the service "_name
-				set:$g(sECPIP)="" Warn($i(Warn))="If ECP configuration is enabled, it is best to limit the connection of ECP clients to the ECP server"
-				set prop("ClientSystems")=sECPIP
-			}
-			set tSC=##class(Security.Services).Modify(name,.prop)
-			if '$$$ISOK(tSC) write !,name_": Error="_$SYSTEM.Status.GetErrorText(tSC)
-		}
-	}
-	write !,"Passwords are created for all CSP applications."
-	set result=##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
-	set tSC=result.Prepare("select Name FROM Security.Applications")
-	set:tSC tSC=result.Execute()
-	if '$$$ISOK(tSC) {
-		set text="Application setup error :"_$SYSTEM.Status.GetErrorText(tSC)  write !,text QUIT $$$ERROR(text)
-	}
-	else {
-		#; List of disconnected applications
-		set appDisabled("/csp/ensdemo")=1
-		set appDisabled("/csp/samples")=1
-		set appDisabled("/csp/user")=1
-		set appDisabled("/isc/studio/usertemplates")=1
-		set appDisabled("/csp/docbook")=1  
-		set appDisabled("/csp/documatic")=1
-		set appDisabled("/isc/studio/rules")=1
-		set appDisabled("/isc/studio/templates")=1
-		while result.Next() {
-			set CSP=result.Data("Name")
-			set csp=$zconvert(CSP,"L")
-			kill prop
-			if $g(appDisabled(csp)) {
-				set prop("Enabled")=0
-			} else {
-				  set prop("Enabled")=1
-			}
-		 set prop("AutheEnabled")=AutheEnabled 
-		 set tSC=##class(Security.Applications).Modify(CSP,.prop)
-		 if '$$$ISOK(tSC) write !,csp_" : Error="_$SYSTEM.Status.GetErrorText(tSC)
-		}
-	}
-	if DemoDelete {
-		write !,"Demo namespaces are being deleted."
-		for name="ENSDEMO","SAMPLES" {
-			do:##class(%Dictionary.CompiledClass).%ExistsId("%Library.EnsembleMgr")
-			set tSC = ##class(Config.Namespaces).Delete(name)
-			if $$$ISERR(tSC) set text="Delete Error "_name_" :"_$system.Status.GetErrorText(tSC) w !,text
-			if $$$ISOK(tSC) write !,"Deleted "_name
-		}
-	}
-	write !,"There is a modification of the basic system settings"
-	#dim ss As Security.System  = ##class(Security.System).%OpenId("SYSTEM")
-	set ss.PasswordPattern="8.32ANP"
-	set ss.AuditEnabled=+AuditOn
-	set ss.InactiveLimit=InactiveLimit
-	set tSC=ss.%Save()
-	if '$$$ISOK(tSC) s text="Error setting basic security settings :"_$SYSTEM.Status.GetErrorText(tSC)  write !,text QUIT $$$ERROR(text)
-	if AuditOn {
-		write !,"Event Setup AUDIT :"
-		Set rs = ##class(%ResultSet).%New("Security.Events:ListActivate")
-		Set tSC = rs.Execute()
-		if $$$ISERR(tSC) set text="Event setting error AUDIT:"_$system.Status.GetErrorText(tSC) write !,text QUIT $$$ERROR(text)
-		set On("%Ensemble/%Message/ViewContents")=1
-		set On("%System/%DirectMode/DirectMode")=1
-		set On("%System/%Login/Login")=1
-		set On("%System/%Login/LoginFailure")=1
-		set On("%System/%Login/Logout")=1
-		set On("%System/%Login/Terminate")=1
-		set On("%System/%Security/ApplicationChange")=1
-		set On("%System/%Security/AuditChange")=1
-		set On("%System/%Security/AuditReport")=1
-		set On("%System/%Security/DBEncChange")=1
-		set On("%System/%Security/DomainChange")=1
-		set On("%System/%Security/LoginRuleChange")=1
-		set On("%System/%Security/Protect")=1
-		set On("%System/%Security/ResourceChange")=1
-		set On("%System/%Security/RoleChange")=1
-		set On("%System/%Security/ServiceChange")=1
-		set On("%System/%Security/SSLConfigChange")=1
-		set On("%System/%Security/SystemChange")=1
-		set On("%System/%Security/UserChange")=1
-		set On("%System/%System/AuditRecordLost")=1
-		set On("%System/%System/ConfigurationChange")=1
-		set On("%System/%System/JournalChange")=0
-		set On("%System/%System/RoutineChange")=1
-		set On("%System/%System/Start")=1
-		set On("%System/%System/Stop")=1
-		set On("%System/%System/SuspendResume")=1
-		set On("%System/%System/UserEventOverflow")=1
-		While rs.Next() {
-			set name = $G(rs.Data("Source"))_"/"_$G(rs.Data("Type"))_"/"_$G(rs.Data("Name"))
-			if $DATA(On(name)) {
-				kill pro
-				do ##class(Security.Events).Get($g(rs.Data("Source")),$G(rs.Data("Type")),$G(rs.Data("Name")),.pro)
-				if $d(pro) {
-					if pro("Enabled")'=(+$G(On(name))) {
-						if ##Class(Security.Events).Exists(name,,,.Event,.Status) {
-							set Event.Enabled=+$G(On(name))
-							set tSC=Event.%Save()
-							if '$$$ISOK(tSC) w !,name_": Error="_$SYSTEM.Status.GetErrorText(tSC)
-							else  write !,name_" changed"
-						}
-					}
-				}
-			}
-		}
-		do rs.Close()
-	}
-	quit $$$OK
-}
-
 /// Save Access Rights
 /// d ##class(App.security).UiSavePermiss(.Par)
 ClassMethod UiSavePermiss(Par = "") As %Status
@@ -241,42 +63,6 @@ ClassMethod UiSavePermiss(Par = "") As %Status
 	Quit $$$OK
 }
 
-/// do ##class(App.security).GetPreparedUsers()
-ClassMethod GetPreparedUsers() As %String
-{
-  q "Admin,CSPSystem,IAM,SuperUser,UnknownUser,_Ensemble,_SYSTEM"
-}
-
-/// Change password for userlist
-/// do ##class(App.security).ChangePassword("msw", ##class(App.security).GetPreparedUsers())
-ClassMethod ChangePassword(newPassword = "", UsersList = "") As %Status
-{
-	new $namespace
-	set $namespace="%SYS"
-	set result=##CLASS(%ResultSet).%New("%DynamicQuery:SQL")
-	set sql="select NameLowerCase FROM Security.Users where NameLowerCase in ('"_$replace($zconvert(UsersList,"L"),",","','")_"')"
-	;w !,sql
-	set tSC=result.Prepare(sql)
-	set:tSC tSC=result.Execute()
-	if '$$$ISOK(tSC) {
-		set text="User configuration error :"_$SYSTEM.Status.GetErrorText(tSC) write !,text
-		QUIT $$$ERROR(text)
-	}
-	else {
-		while result.Next() {
-			set name=result.Data("NameLowerCase")
-			;w !,name continue
-			kill prop
-			set prop("Password")=newPassword
-			if name="_system" s prop("Enabled")=0
-			if name="unknownuser" s prop("Roles")="" ; delete all roles
-			set tSC=##class(Security.Users).Modify(name,.prop)
-			if '$$$ISOK(tSC) w !,name_": Error="_$SYSTEM.Status.GetErrorText(tSC)
-		}
-	}
-	q tSC
-}
-
 /// Get HTML content of access matrix form
 /// d ##class(App.security).UiMatrixPermission("sm","sp","Ui","AnyKey","App.security","Ui"_"SavePermiss")
 ClassMethod UiMatrixPermission(name = "", rolesmask = "", divId = "", key = "", class = "", Method = "", blockui = 1) As %Status
@@ -330,6 +116,46 @@ ClassMethod UiMatrixPermission(name = "", rolesmask = "", divId = "", key = "", 
 		;TODO do ##class(App.Form).DrawTable(.matrix) 
 		write "</form><div id='"_divId_"ContentSave'></div>"
 		quit $$$OK
+}
+
+/// Create users and Save Access Rights
+/// s Users("Test1","%All")=1,Users("Test1")=$lb("Pass","Description") w ##class(App.LockDown).Modify(.Users)
+ClassMethod UsersModify(users = "") As %Status
+{
+
+	new $NAMESPACE
+  	set $NAMESPACE = "%SYS"
+  	set tSC=$$$OK
+	set us=""
+	for { set us=$o(users(us)) quit:us=""
+			;if not exist then create TODO
+			if '##class(Security.Users).Exist(us) {
+				continue
+			}
+			set tSC=##class(Security.Users).Get(us,.prop)
+			if '$$$ISOK(tSC)  write $$$appError(us_": Error="_$SYSTEM.Status.GetErrorText(tSC)) quit
+		
+			set roles=","_prop("Roles")_","
+			kill prop
+			set ro=""
+			for { set ro=$o(users(us,ro)) quit:ro=""
+				if $g(users(us,ro)) {
+					if roles'[(","_ro_",") set roles=roles_ro_","
+				}else {
+					if roles[(","_ro_",") set roles=$replace(roles,ro_",","") set:$e(roles,*)'="," roles=roles_","
+				}
+			}
+			set:$e(roles,1)="," roles=$e(roles,2,*)
+			set:$e(roles,*)="," roles=$e(roles,1,*-1)
+			set prop("Roles")=roles
+			;zw prop
+			set tSC=##class(Security.Users).Modify(us,.prop)
+			if '$$$ISOK(tSC) quit
+			;Check
+			set tSC=##class(Security.Users).Get(us,.pro)
+			if '$$$ISOK(tSC) quit
+	}
+	Quit tSC
 }
 
 }

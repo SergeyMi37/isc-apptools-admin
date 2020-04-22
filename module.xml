@@ -3,7 +3,7 @@
   <Document name="isc-apptools-admin.ZPM">
     <Module>
       <Name>isc-apptools-admin</Name>
-      <Version>1.0.6</Version>
+      <Version>1.0.7</Version>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
         <Resource Name="App.PKG"/>
@@ -12,6 +12,7 @@
             SourcePath="/web"
             DeployPath="${cspdir}/apptools"
             Url="/apptools" 
+            ServeFiles="1"
             CookiePath="/apptools/"
             PasswordAuthEnabled="1"
             AuthenticationMethods="32" 
@@ -21,9 +22,6 @@
         <CSPApplication
             Url="/apptoolsrest"
             CookiePath="/apptools/"
-            SourcePath="/web"
-            DeployPath="${cspdir}/apptools"
-            ServeFiles="1"
             PasswordAuthEnabled="1"
             AuthenticationMethods="32" 
             MatchRoles=":%DB_${Namespace}"
