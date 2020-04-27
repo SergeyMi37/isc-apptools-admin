@@ -53,14 +53,6 @@ zpm:USER>install isc-apptools-admin
  - there is a module for implementing the LockedDown mode - ##class(App.security).LockDown(...)
  - multilanguage interface supported (install the global from C:\path\cache-iris-apptools-master\src\glb\appcachemsg.xml).
 
-## Charts admins
-
- Load http://your-host:your-port/apptools/App.Chart.cls?panel=class(App.ChartPanel).ChartAlert
-  - output of the DBMS events using the iris.log protocol (cconsole.log)
-
- Load http://your-host:your-port/apptools/App.Chart.cls?panel=class(App.ChartPanel).ChartAlert
-  - output of the growth dynamics of DBMS database files using the iris.log protocol (cconsole.log)
-
 ## Class explorer
  Load http://your-host:your-port/apptools/App.FormExp.cls?panel=AccordionExp
   - Navigation by namespaces, class, and class instance. Create, edit, and delete class instances in the on-screen form interface.
@@ -79,7 +71,14 @@ zpm:USER>install isc-apptools-admin
    
  Load http://your-host:your-port/apptools/App.TabsPanelUikitAdmin.cls
   - UiKit.js based application template for admin panels
-   
+
+## Charts admins
+
+ Load http://your-host:your-port/apptools/App.Chart.cls?panel=class(App.ChartPanel).ChartAlert
+  - output of the DBMS events using the iris.log protocol (cconsole.log)
+
+ Load http://your-host:your-port/apptools/App.Chart.cls?panel=class(App.ChartPanel).ChartAlert
+  - output of the growth dynamics of DBMS database files using the messages.log protocol (cconsole.log)
 
 ## Save queries to the global for future use in front-end applications
 ```
