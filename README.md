@@ -68,6 +68,7 @@ zpm:USER>install isc-apptools-admin
 ##  Matrix permissions
  Load http://your-host:your-port/apptools/apptools/App.TabsPanelUikitPermissMatrx.cls?autoload=Matrix
   - Group assignment of roles to users by selecting them by filter in the screen panel
+  [Matrix permissions](https://github.com/SergeyMi37/cache-iris-app-tools/blob/master/acc-matrix.gif)
 
 ## Templates & Samples  
  Load http://your-host:your-port/apptools/App.TabsPanelSample.cls   
