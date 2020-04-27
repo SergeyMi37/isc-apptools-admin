@@ -37,6 +37,9 @@ Open IRIS terminal:
 
 ```
 $ docker-compose exec iris iris session iris
+USER>
+USER>zpm
+zpm:USER>install isc-apptools-admin
 ```
 
 ## Panel for admins & developers
