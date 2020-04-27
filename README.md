@@ -80,6 +80,9 @@ zpm:USER>install isc-apptools-admin
  Load http://your-host:your-port/apptools/App.Chart.cls?panel=class(App.ChartPanel).ChartAlert
   - output of the growth dynamics of DBMS database files using the messages.log protocol (cconsole.log)
 
+## REST-API admins
+In this solution, I use REST-API adapted from the [Webterminal](https://github.com/intersystems-community/webterminal) and [metrics ^mgstat](https://habr.com/ru/company/intersystems/blog/318940/)
+
 ## Save queries to the global for future use in front-end applications
 ```
 IRISAPP>do ##class(App.sys).SaveQuery("%SYSTEM.License:Counts", "^test",123)
