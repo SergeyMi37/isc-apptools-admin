@@ -53,6 +53,9 @@ zpm:USER>install isc-apptools-admin
  - there is a module for implementing the LockedDown mode - ##class(App.security).LockDown(...)
  - multilanguage interface supported (install the global from C:\path\cache-iris-apptools-master\src\glb\appcachemsg.xml).
 
+## REST-API
+In this solution, I use REST-API adapted from the [Webterminal](https://github.com/intersystems-community/webterminal) and [metrics ^mgstat](https://habr.com/ru/company/intersystems/blog/318940/)
+
 ## Class explorer
  Load http://your-host:your-port/apptools/App.FormExp.cls?panel=AccordionExp
   - Navigation by namespaces, class, and class instance. Create, edit, and delete class instances in the on-screen form interface.
